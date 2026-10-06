@@ -28,12 +28,15 @@ class IntakeResult(BaseModel):
     summary: str
     indicators: Indicators
     search_queries: List[str] = Field(default_factory=list)  # code uses [:3]
+    embedded_instructions: bool = False
+    embedded_instructions_note: str = ""
 
 
 class IntelItem(BaseModel):
     title: str
     url: str
     finding: str
+    product: str = "not stated"   # vendor/product the finding concerns
 
 
 class IntelResult(BaseModel):

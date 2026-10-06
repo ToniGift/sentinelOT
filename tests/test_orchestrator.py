@@ -97,3 +97,38 @@ def test_catalogue_has_clean_descriptions():
     assert all(c["what"] for c in cat)
     assert not any("Citation" in c["what"] or "](" in c["what"] for c in cat)
     assert max(len(c["what"]) for c in cat) <= 220
+
+
+def test_inconsistent_triage_gets_one_review(monkeypatch):
+    calls = {"n": 0}
+
+    def inconsistent_then_fixed(model, system, user, schema, **kw):
+        if schema is TriageResult:
+            calls["n"] += 1
+            pr = "P1" if calls["n"] == 1 else "P3"
+            return TriageResult(verdict="investigate", priority=pr,
+                                confidence=0.7, process_impact="i",
+                                reasoning="r",
+                                evidence=["alert.title: x",
+                                          "alert.raw: invented"]), U()
+        return fake_call_json(model, system, user, schema)
+
+    monkeypatch.setattr(o, "call_json", inconsistent_then_fixed)
+    monkeypatch.setattr(o, "search", lambda q: [])
+    r = o.run_triage(SCENARIOS["s02"])
+    assert calls["n"] == 2
+    assert r["triage"]["priority"] == "P3"
+    assert [x["step"] for x in r["trace"]].count("triage_review") == 1
+    assert r["evidence_dropped"] == 1
+    assert r["triage"]["evidence"] == ["alert.title: x"]
+    assert any("re-checked" in n for n in r["notes"])
+
+
+def test_injection_flag_is_set_by_code(monkeypatch):
+    from scenarios_heldout import SCENARIOS as H1
+    monkeypatch.setattr(o, "call_json", fake_call_json)
+    monkeypatch.setattr(o, "search", lambda q: [])
+    r = o.run_triage(H1["h06"])
+    assert r["security_flags"]["embedded_instructions"] is True
+    r2 = o.run_triage(SCENARIOS["s01"])
+    assert r2["security_flags"]["embedded_instructions"] is False

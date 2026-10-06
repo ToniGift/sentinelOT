@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SentinelOT - OT/ICS alert triage copilot</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1b1f24;--muted:#5b6672;--line:#d9dee5;
+--accent:#1f3864;--esc:#b3261e;--inv:#b26a00;--ben:#2e7d32;--escbg:#fde8e7;
+--invbg:#fff3df;--benbg:#e5f4e6}
+@media(prefers-color-scheme:dark){:root{--bg:#14171b;--card:#1c2026;--text:#e8ebef;
+--muted:#9aa5b1;--line:#333a43;--accent:#8fb0ee;--esc:#ff8a80;--inv:#ffcc80;
+--ben:#8fd694;--escbg:#3a1f1d;--invbg:#3a2d17;--benbg:#1d3320}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header,main,footer{max-width:980px;margin:0 auto;padding:16px}
+header h1{margin:8px 0 0;color:var(--accent)}
+header p{margin:0;color:var(--muted)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;
+padding:16px;margin:14px 0}
+h2{font-size:1.05rem;margin:0 0 8px;color:var(--accent)}
+select,button{font:inherit;padding:8px 12px;border-radius:8px;
+border:1px solid var(--line);background:var(--card);color:var(--text)}
+select{max-width:100%}
+button{cursor:pointer;background:var(--accent);color:var(--card);border-color:var(--accent)}
+button.secondary{background:var(--card);color:var(--text);border-color:var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.alert{margin-top:10px;padding:10px;border-left:4px solid var(--accent);
+background:var(--bg);border-radius:6px}
+.verdict{padding:12px 14px;border-radius:8px;font-weight:600;margin-bottom:10px}
+.verdict.escalate{background:var(--escbg);color:var(--esc)}
+.verdict.investigate{background:var(--invbg);color:var(--inv)}
+.verdict.likely_benign{background:var(--benbg);color:var(--ben)}
+.verdict.warn{background:var(--invbg);color:var(--inv);font-weight:500}
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.8rem;
+border:1px solid var(--line);margin-right:6px;white-space:nowrap}
+.badge.approval{color:var(--inv);border-color:var(--inv)}
+.badge.readonly{color:var(--ben);border-color:var(--ben)}
+.badge.unver{color:var(--esc);border-color:var(--esc)}
+ul{margin:6px 0;padding-left:20px}
+li{margin:4px 0}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+.wrap{overflow-x:auto}
+a{color:var(--accent)}
+.step{display:flex;gap:8px;padding:3px 0}
+.dot{width:1.2em;text-align:center}
+#msg{color:var(--esc);margin:8px 0}
+footer{color:var(--muted);font-size:.88rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>SentinelOT</h1>
+  <p>AI-powered OT/ICS security alert triage copilot</p>
+</header>
+<main>
+  <section>
+    <h2>1. Choose a synthetic alert</h2>
+    <div class="row">
+      <select id="scn" aria-label="Scenario"></select>
+      <button id="run">Run triage</button>
+      <button id="saved" class="secondary">Show last saved result</button>
+    </div>
+    <div id="alertBox" class="alert small"></div>
+    <div id="msg" role="alert"></div>
+  </section>
+  <section id="progress" hidden>
+    <h2>2. Agents working</h2>
+    <div id="steps"></div>
+  </section>
+  <section id="out" hidden></section>
+</main>
+<footer>
+  SentinelOT recommends and never executes actions. Every alert and asset
+  here is synthetic. Built on Nebius Token Factory (NVIDIA Nemotron models)
+  with live threat-intelligence retrieval from Tavily. A human analyst makes
+  the final decision.
+</footer>
+<script>
+const $ = id => document.getElementById(id);
+function el(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === 'class') e.className = v; else e.setAttribute(k, v);
+  }
+  for (const c of kids) { if (c == null) continue;
+    e.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return e;
+}
+function safeUrl(u) {
+  try { const x = new URL(u);
+    return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : null;
+  } catch (e) { return null; }
+}
+function attackUrl(id) {
+  return 'https://attack.mitre.org/techniques/' + id.replace('.', '/') + '/';
+}
+const STEPS = [['intake','Intake agent'],['search','Threat-intel search'],
+  ['intel','Intel agent'],['mapper','ATT&CK mapper'],
+  ['triage','Triage analyst'],['advisor','Response advisor']];
+let scenarios = [], timer = null;
+
+async function loadScenarios() {
+  const r = await fetch('api/scenarios');
+  scenarios = await r.json();
+  const sel = $('scn');
+  [['development','Development scenarios'],['held-out','Held-out scenarios (first set)'],['held-out-2','Fresh held-out scenarios (second set)']]
+    .forEach(([g, label]) => {
+      const og = el('optgroup', {label});
+      scenarios.filter(s => s.group === g).forEach(s =>
+        og.append(el('option', {value: s.id}, s.id.toUpperCase() + '  ' + s.title)));
+      sel.append(og);
+    });
+  showAlert();
+}
+function showAlert() {
+  const s = scenarios.find(x => x.id === $('scn').value);
+  const box = $('alertBox'); box.replaceChildren();
+  if (!s) return;
+  box.append(el('div', {}, el('strong', {}, s.title)),
+    el('div', {class: 'muted'}, [s.timestamp, s.protocol,
+      (s.src_ip || '?') + ' -> ' + (s.dst_ip || '?')].filter(Boolean).join('  |  ')),
+    el('div', {}, s.description));
+}
+function setMsg(t) { $('msg').textContent = t || ''; }
+function renderSteps(trace, running) {
+  const done = {}; trace.forEach(r => done[r.step] = r);
+  const box = $('steps'); box.replaceChildren();
+  STEPS.forEach(([k, label]) => {
+    const r = done[k];
+    const mark = r ? (r.status === 'failed' ? '!' : '\u2713') : (running ? '\u2026' : '\u2022');
+    box.append(el('div', {class: 'step'}, el('span', {class: 'dot'}, mark),
+      el('span', {}, label), el('span', {class: 'muted'},
+        r ? ('  ' + r.seconds + ' s' + (r.model && r.model !== 'tavily' ? '  (' + r.model + ')' : '')) : '')));
+  });
+}
+function list(items, render) {
+  const ul = el('ul'); items.forEach(i => ul.append(el('li', {}, ...render(i)))); return ul;
+}
+function renderResult(r) {
+  const out = $('out'); out.replaceChildren(); out.hidden = false;
+  const t = r.triage;
+  out.append(el('h2', {}, '3. Triage result'));
+  if (r.security_flags && r.security_flags.embedded_instructions) {
+    out.append(el('div', {class: 'verdict warn'},
+      'Warning: the alert text contains instructions aimed at the analysis system. ' +
+      'SentinelOT ignored them and treats this as a possible sign of tampering. ' +
+      (r.security_flags.note ? '(' + r.security_flags.note + ')' : '')));
+  }
+  out.append(
+    el('div', {class: 'verdict ' + t.verdict},
+      t.verdict.replace('_', ' ').toUpperCase() + '   |   priority ' + t.priority +
+      '   |   confidence ' + Number(t.confidence).toFixed(2)),
+    el('p', {}, el('strong', {}, 'Process impact: '), t.process_impact),
+    el('p', {}, el('strong', {}, 'Reasoning: '), t.reasoning),
+    el('strong', {}, 'Evidence'), list(t.evidence, e => [e]));
+  (r.notes || []).forEach(n => out.append(el('p', {class: 'muted small'}, 'Note: ' + n)));
+
+  out.append(el('h2', {}, 'MITRE ATT&CK for ICS'));
+  if (!r.attack.techniques.length) out.append(el('p', {class: 'muted'}, 'No technique mapped.'));
+  else out.append(list(r.attack.techniques, x => [
+    el('a', {href: attackUrl(x.id), target: '_blank', rel: 'noopener noreferrer'}, x.id),
+    ' ' + x.name + ' - ' + x.rationale]));
+
+  out.append(el('h2', {}, 'Threat intelligence'), el('p', {}, r.intel.summary));
+  out.append(list(r.intel.items, i => {
+    const u = safeUrl(i.url);
+    return [el('strong', {}, (i.product || 'not stated') + ': '), i.finding + ' ', u ? el('a', {href: u, target: '_blank', rel: 'noopener noreferrer'}, 'source') : '(invalid link)',
+      i.trusted ? '' : el('span', {class: 'badge unver'}, ' unverified source')];
+  }));
+  if (r.intel.dropped_unverified) out.append(el('p', {class: 'muted small'},
+    r.intel.dropped_unverified + ' item(s) removed because their link was not in the retrieved results.'));
+
+  out.append(el('h2', {}, 'Recommended actions (human decides)'), el('p', {}, r.advice.summary));
+  out.append(list(r.advice.actions, a => [
+    el('span', {class: 'badge ' + (a.type === 'read_only' ? 'readonly' : 'approval')},
+      a.type === 'read_only' ? 'read-only' : 'needs operator approval'), a.action]));
+
+  out.append(el('h2', {}, 'Agent trace'));
+  const tb = el('table'); tb.append(el('tr', {}, ...['Step','Model','Seconds','Tokens in','Tokens out','Status']
+    .map(h => el('th', {}, h))));
+  r.trace.forEach(x => tb.append(el('tr', {}, el('td', {}, x.step), el('td', {}, x.model),
+    el('td', {}, x.seconds), el('td', {}, x.prompt_tokens == null ? '-' : x.prompt_tokens),
+    el('td', {}, x.completion_tokens == null ? '-' : x.completion_tokens), el('td', {}, x.status))));
+  out.append(el('div', {class: 'wrap'}, tb),
+    el('p', {class: 'muted small'}, 'Total time ' + r.total_seconds + ' s.'));
+  if (r.errors && r.errors.length) out.append(el('p', {class: 'muted small'}, 'Notes: ' + r.errors.join(' | ')));
+  out.scrollIntoView({behavior: 'smooth'});
+}
+async function run() {
+  setMsg(''); $('out').hidden = true;
+  $('run').disabled = true; $('progress').hidden = false; renderSteps([], true);
+  try {
+    const r = await fetch('api/demo/' + encodeURIComponent($('scn').value), {method: 'POST'});
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || 'Request failed');
+    poll(j.job_id);
+  } catch (e) { setMsg(e.message); $('run').disabled = false; $('progress').hidden = true; }
+}
+function poll(id) {
+  clearInterval(timer);
+  timer = setInterval(async () => {
+    try {
+      const r = await fetch('api/jobs/' + id); const j = await r.json();
+      renderSteps(j.trace, j.status === 'running');
+      if (j.status === 'done') { clearInterval(timer); $('run').disabled = false; renderResult(j.result); }
+      if (j.status === 'error') { clearInterval(timer); $('run').disabled = false;
+        setMsg('The run failed: ' + j.error + ' You can still open the last saved result.'); }
+    } catch (e) { clearInterval(timer); $('run').disabled = false; setMsg('Lost connection to the server.'); }
+  }, 1500);
+}
+async function showSaved() {
+  setMsg(''); $('progress').hidden = true;
+  const r = await fetch('api/saved/' + encodeURIComponent($('scn').value));
+  if (!r.ok) { setMsg('No saved result for this scenario yet. Run it once first.'); return; }
+  renderResult(await r.json());
+}
+$('scn').addEventListener('change', showAlert);
+$('run').addEventListener('click', run);
+$('saved').addEventListener('click', showSaved);
+loadScenarios();
+</script>
+</body>
+</html>
