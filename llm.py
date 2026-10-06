@@ -1,14 +1,32 @@
 import json
 import os
 import re
+import time
 
-from openai import OpenAI
+from openai import APIConnectionError, APIStatusError, OpenAI
 
 from config import NEBIUS_BASE_URL
 
 client = OpenAI(base_url=NEBIUS_BASE_URL, api_key=os.environ["NEBIUS_API_KEY"],
-                timeout=90.0, max_retries=1)
+                timeout=float(os.getenv("LLM_TIMEOUT_S", "60")), max_retries=0)
 THINK = re.compile(r"<think>.*?</think>", re.DOTALL)
+
+
+def _create(**kw):
+    """One model call with a single retry on timeouts, connection errors,
+    rate limits (429) and server errors (5xx). Keeps the worst case for one
+    call near twice the timeout instead of minutes."""
+    for attempt in (0, 1):
+        try:
+            return client.chat.completions.create(**kw)
+        except APIConnectionError:          # includes timeouts
+            if attempt:
+                raise
+            time.sleep(1)
+        except APIStatusError as e:
+            if attempt or e.status_code not in (429, 500, 502, 503, 504):
+                raise
+            time.sleep(2)
 
 
 def extract_json(text: str) -> dict:
@@ -32,9 +50,8 @@ def call_json(model, system, user, schema, temperature=0.2,
             msgs.append({"role": "user", "content":
                          f"Your previous reply was invalid: {err}. "
                          "Return only one valid JSON object."})
-        r = client.chat.completions.create(
-            model=model, messages=msgs,
-            temperature=temperature, max_tokens=max_tokens)
+        r = _create(model=model, messages=msgs,
+                    temperature=temperature, max_tokens=max_tokens)
         content = r.choices[0].message.content or ""
         try:
             return schema.model_validate(extract_json(content)), r.usage

@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -17,6 +18,7 @@ from schemas import (AdvisorResult, Indicators, IntakeResult, IntelResult,
 TECHS = load_ics()
 CATALOGUE = catalogue(TECHS)
 NAMES = {c["id"]: c["name"] for c in CATALOGUE}
+RUN_BUDGET_S = float(os.getenv("RUN_BUDGET_S", "200"))
 ORDER = {"intake": 0, "search": 1, "intel": 2, "mapper": 3,
          "triage": 4, "triage_review": 4.5, "advisor": 5}
 
@@ -179,10 +181,16 @@ def run_triage(alert, trace_sink=None) -> dict:
         notes.append(f"{len(dropped)} evidence item(s) removed because they "
                      "cited data that does not exist.")
 
-    # 5 Advisor
-    advice = step(trace, errors, "advisor", ADVISOR_SYS,
-                  {"triage": triage.model_dump(), "assets": ctx,
-                   "attack": attack_out}, AdvisorResult)
+    # 5 Advisor (optional; skipped if the run is already very slow)
+    if time.time() - t_start > RUN_BUDGET_S:
+        advice = None
+        notes.append(f"Recommended actions were skipped because the run took "
+                     f"more than {int(RUN_BUDGET_S)} seconds (the model "
+                     "service was slow).")
+    else:
+        advice = step(trace, errors, "advisor", ADVISOR_SYS,
+                      {"triage": triage.model_dump(), "assets": ctx,
+                       "attack": attack_out}, AdvisorResult)
     advice_out = (advice.model_dump() if advice else
                   {"summary": "Advisor unavailable.", "actions": []})
 

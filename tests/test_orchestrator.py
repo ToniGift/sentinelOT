@@ -132,3 +132,13 @@ def test_injection_flag_is_set_by_code(monkeypatch):
     assert r["security_flags"]["embedded_instructions"] is True
     r2 = o.run_triage(SCENARIOS["s01"])
     assert r2["security_flags"]["embedded_instructions"] is False
+
+
+def test_advisor_skipped_when_run_budget_exceeded(monkeypatch):
+    monkeypatch.setattr(o, "call_json", fake_call_json)
+    monkeypatch.setattr(o, "search", lambda q: [])
+    monkeypatch.setattr(o, "RUN_BUDGET_S", -1)
+    r = o.run_triage(SCENARIOS["s02"])
+    assert r["advice"]["actions"] == []
+    assert "advisor" not in [x["step"] for x in r["trace"]]
+    assert any("skipped" in n for n in r["notes"])

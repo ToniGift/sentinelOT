@@ -203,12 +203,14 @@ async function run() {
   } catch (e) { setMsg(e.message); $('run').disabled = false; $('progress').hidden = true; }
 }
 function poll(id) {
-  clearInterval(timer);
+  clearInterval(timer); const started = Date.now();
   timer = setInterval(async () => {
     try {
       const r = await fetch('api/jobs/' + id); const j = await r.json();
       renderSteps(j.trace, j.status === 'running');
-      if (j.status === 'done') { clearInterval(timer); $('run').disabled = false; renderResult(j.result); }
+      if (j.status === 'running' && Date.now() - started > 75000)
+        setMsg('The model service is responding slowly. Keep waiting, or press "Show last saved result".');
+      if (j.status === 'done') { clearInterval(timer); setMsg(''); $('run').disabled = false; renderResult(j.result); }
       if (j.status === 'error') { clearInterval(timer); $('run').disabled = false;
         setMsg('The run failed: ' + j.error + ' You can still open the last saved result.'); }
     } catch (e) { clearInterval(timer); $('run').disabled = false; setMsg('Lost connection to the server.'); }
