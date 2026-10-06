@@ -1,0 +1,10 @@
+{
+  "10.10.20.11": {"name": "PLC-Line1", "type": "PLC", "zone": "Level 1 control", "criticality": "high", "function": "Packaging line 1 control"},
+  "10.10.20.12": {"name": "PLC-Line2", "type": "PLC", "zone": "Level 1 control", "criticality": "high", "function": "Packaging line 2 control, has an EtherNet/IP I/O module"},
+  "10.10.20.30": {"name": "RTU-Outstation-3", "type": "RTU", "zone": "Level 1 control", "criticality": "high", "function": "Utility metering outstation, reports to SCADA over DNP3"},
+  "10.10.30.5":  {"name": "HMI-Line1", "type": "HMI", "zone": "Level 2 supervisory", "criticality": "medium", "function": "Operator screen for line 1"},
+  "10.10.30.10": {"name": "SCADA-SRV-01", "type": "SCADA server", "zone": "Level 2 supervisory", "criticality": "high", "function": "SCADA server with OPC-UA endpoint and DNP3 master"},
+  "10.10.40.8":  {"name": "ENG-WS-01", "type": "Engineering workstation", "zone": "Level 3 operations", "criticality": "high", "function": "PLC programming. Approved change window: Tuesday 08:00-10:00 local time"},
+  "10.10.40.20": {"name": "HIST-01", "type": "Historian", "zone": "Level 3 operations", "criticality": "medium", "function": "Process data historian, polls PLCs read-only"},
+  "10.10.50.7":  {"name": "OFFICE-PC-14", "type": "Office PC", "zone": "Level 4 enterprise", "criticality": "low", "function": "Office workstation, not an engineering station"}
+}
