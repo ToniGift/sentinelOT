@@ -1,12 +1,15 @@
 import json
+import os
 import sqlite3
 import time
 from contextlib import closing
 
-DB = "data/sentinelot.sqlite"
+STATE_DIR = os.getenv("STATE_DIR", "data")
+DB = f"{STATE_DIR}/sentinelot.sqlite"
 
 
 def _con():
+    os.makedirs(os.path.dirname(DB) or ".", exist_ok=True)
     con = sqlite3.connect(DB, timeout=10)
     con.execute("CREATE TABLE IF NOT EXISTS results ("
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, "

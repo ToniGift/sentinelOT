@@ -10,7 +10,7 @@ TRUSTED = ["cisa.gov", "attack.mitre.org", "nvd.nist.gov", "cve.org"]
 # Vendor security-advisory sites. Add the vendors in your own asset list.
 VENDORS = ["cisco.com", "siemens.com", "schneider-electric.com",
            "rockwellautomation.com", "mitsubishielectric.com", "abb.com"]
-CACHE = "data/cache"
+CACHE = os.path.join(os.getenv("STATE_DIR", "data"), "cache")
 DEPTH = os.getenv("TAVILY_SEARCH_DEPTH", "basic")   # "basic" or "advanced"
 os.makedirs(CACHE, exist_ok=True)
 
