@@ -16,6 +16,16 @@ The interface is a single file, `static/index.html`, with no build step. It is s
 - **If the API cannot be reached** (for example when the file is opened straight from disk), the page shows clearly labelled sample data for two alerts instead of failing silently. Sample runs are never saved to history.
 - **Footer details.** The repository link and any personal links are set in the `ABOUT` block near the top of the script in `static/index.html`. Empty values are not shown.
 
+## Screenshots
+
+**The pipeline drawing after a finished run.** Every step shows its real time. The two small valve symbols mark where code checks the output, and the search and the ATT&CK mapper are drawn side by side because they run side by side.
+
+![The page after a finished run, with the pipeline drawing showing each step and its time](screenshot-pipeline.png)
+
+**The timing tab.** It lists the model, time, prompt tokens and output tokens of every step. In this run the six steps add up to 35.3 seconds, but the run took 29 seconds, because the search and the ATT&CK mapper ran side by side.
+
+![The Timing and raw result tab, listing each step with its model, seconds and token counts](screenshot-timing.png)
+
 ## API used by the page
 
 | Endpoint | Purpose |

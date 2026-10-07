@@ -8,13 +8,22 @@ Every example here uses a synthetic alert in a fictional plant (see [Test plant]
 
 ## Example 1: an office PC writes to a production PLC
 
-For an alert reporting a Modbus "write single coil" command from an office PC to a production PLC, SentinelOT returned, in about 28 seconds:
+**The alert:** a Modbus/TCP "write single coil" command (function code 5) from an office PC to the line 1 PLC, setting coil 12 to ON. The source host had never written to this PLC before.
 
-- **Verdict:** escalate, priority P1, confidence 0.92
-- **Why:** an office workstation (low criticality, not an engineering station) wrote to a high-criticality PLC for the first time
-- **ATT&CK for ICS:** T0831 Manipulation of Control
-- **Threat intelligence:** a CISA guidance document, labelled as background
-- **Next steps:** three read-only checks and three actions that need operator approval
+SentinelOT returned, in 26 seconds:
+
+- **Verdict:** escalate, priority P1, confidence 90%
+- **Why:** an office workstation (Level 4 enterprise, low criticality) sent the first write it had ever sent to a high-criticality PLC in Level 1 control, and it is not an engineering station. The result called this unauthorized command traffic reaching a safety-relevant control asset.
+- **ATT&CK for ICS:** two techniques mapped. The explanation mentions an unauthorized command message and I/O image manipulation.
+- **Threat intelligence:** two CISA advisories, both marked as on the trusted list: one about a Delta Electronics PLC that exposes Modbus TCP without authentication, and one about the Schneider Electric Modicon Modbus protocol sending commands in cleartext. They are background about Modbus in general, not about the plant's own PLC.
+- **Evidence:** 21 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
+- **Next steps:** three read-only checks (review the PLC diagnostic and Modbus traffic logs for the state of coil 12, check network flow and IDS logs for other connections from the same host, and interview the user of the office PC) and two that need operator approval (temporarily block Modbus traffic from the source to the PLC at the firewall or zone boundary, and, if the change was not intended, write the coil back to OFF from an approved engineering station)
+
+![A finished run for alert s01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-s01-result.png)
+
+![The next steps in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-s01-next-steps.png)
+
+An earlier run of the same alert returned a confidence of 0.92 in about 28 seconds and mapped T0831, Manipulation of Control. Results vary between runs, which is why the [Evaluation](EVALUATION.md) page reports repeated runs.
 
 ## Example 2: a successful remote login to the SCADA server
 
@@ -28,6 +37,8 @@ SentinelOT returned, in 29 seconds:
 - **Threat intelligence:** six sources retrieved, including a finding that RDP is among the protocols targeted by credential stuffing
 - **Evidence:** 20 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
 - **Next steps:** two read-only checks (review the Windows logon events on the server, and review the VPN authentication logs for the source address) and four that need operator approval (disable or reset the service account, require multi-factor authentication for remote RDP, block RDP from the VPN zone to the supervisory zone unless it is approved, and collect volatile memory and a forensic image of the server)
+
+![A finished run for alert x01, showing the verdict, priority, confidence, reasoning and next steps](screenshot-result.png)
 
 ## Other runs from the live demo
 
