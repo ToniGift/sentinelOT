@@ -14,7 +14,7 @@
 
 SentinelOT does not scan any network or the internet. It searches for published advisories with the Tavily Search API and summarises what comes back. For the s01 alert (an office PC writing to a PLC), the Threat intel tab shows two results, both from `cisa.gov` and both marked **On the trusted list**.
 
-![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list, each with a link and a short finding](screenshot-threat-intel.png)
+![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list, each with a link and a short finding](screenshot-s01-threat-intel.png)
 
 Both are real, public CISA advisories, and the findings match them:
 

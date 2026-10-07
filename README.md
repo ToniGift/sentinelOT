@@ -4,6 +4,8 @@
 
 Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Agents**, on **NVIDIA Nemotron models served by Nebius Token Factory**.
 
+![The SentinelOT web interface: the home page with the intro, the "Why I built it" note and the list of synthetic alerts](docs/screenshot-home.png)
+
 [Demo](#links) | [How it works](#how-it-works) | [Nemotron and Nebius](#how-we-use-nemotron-token-factory-nebius-and-tavily) | [Results](#results-at-a-glance) | [Test plant](#the-test-plant-at-a-glance) | [Run it](#quick-start) | [All documentation](#where-to-go-next)
 
 ## Links
@@ -23,7 +25,7 @@ For an alert reporting five failed RDP logins followed by a successful login to 
 - **Mapped to:** MITRE ATT&CK for ICS T0822 External Remote Services and T0859 Valid Accounts
 - **Next steps:** two read-only checks and four actions that need operator approval
 
-![A finished run for alert x01: verdict Escalate, priority P1, confidence 90%, with the reasoning and the next steps](docs/screenshot-result.png)
+![A finished run for alert x01: verdict Escalate, priority P1, confidence 90%, with the reasoning and the next steps](docs/screenshot-x01-result.png)
 
 More on the [Examples](docs/EXAMPLES.md) page.
 

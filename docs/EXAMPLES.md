@@ -19,9 +19,13 @@ SentinelOT returned, in 26 seconds:
 - **Evidence:** 21 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
 - **Next steps:** three read-only checks (review the PLC diagnostic and Modbus traffic logs for the state of coil 12, check network flow and IDS logs for other connections from the same host, and interview the user of the office PC) and two that need operator approval (temporarily block Modbus traffic from the source to the PLC at the firewall or zone boundary, and, if the change was not intended, write the coil back to OFF from an approved engineering station)
 
-![A finished run for alert s01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-s01-result.png)
+![The pipeline for alert s01 after a finished run, with the time of every step](screenshot-s01-pipeline.png)
 
-![The next steps in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-s01-next-steps.png)
+![The result for alert s01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-s01-result.png)
+
+![The next steps for alert s01 in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-s01-next-steps.png)
+
+![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list](screenshot-s01-threat-intel.png)
 
 An earlier run of the same alert returned a confidence of 0.92 in about 28 seconds and mapped T0831, Manipulation of Control. Results vary between runs, which is why the [Evaluation](EVALUATION.md) page reports repeated runs.
 
@@ -38,7 +42,11 @@ SentinelOT returned, in 29 seconds:
 - **Evidence:** 20 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
 - **Next steps:** two read-only checks (review the Windows logon events on the server, and review the VPN authentication logs for the source address) and four that need operator approval (disable or reset the service account, require multi-factor authentication for remote RDP, block RDP from the VPN zone to the supervisory zone unless it is approved, and collect volatile memory and a forensic image of the server)
 
-![A finished run for alert x01, showing the verdict, priority, confidence, reasoning and next steps](screenshot-result.png)
+![The pipeline for alert x01 after a finished run, with the time of every step](screenshot-x01-pipeline.png)
+
+![The result for alert x01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-x01-result.png)
+
+![The next steps for alert x01 in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-x01-next-steps.png)
 
 ## Other runs from the live demo
 
