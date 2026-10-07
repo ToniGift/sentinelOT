@@ -29,7 +29,7 @@ python -m pytest -q tests      # offline tests
 - Small sample sizes. Three runs of one scenario are not independent evidence.
 - One author wrote every scenario and label. No independent review.
 - Synthetic data only. Not tested on real plant alerts or by working SOC analysts.
-- Benign verdicts lean on notes in the asset inventory.
+- Benign verdicts lean on notes in the asset inventory and on what the alert text says, such as a change ticket reference that SentinelOT cannot check.
 - It can under-call a real threat. In one run, a detected exploit attempt was called likely benign.
 - This is a research prototype, not a production security tool.
 

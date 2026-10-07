@@ -27,7 +27,7 @@ For an alert reporting five failed RDP logins followed by a successful login to 
 
 ![A finished run for alert x01: verdict Escalate, priority P1, confidence 90%, with the reasoning and the next steps](docs/screenshot-x01-result.png)
 
-More on the [Examples](docs/EXAMPLES.md) page.
+More on the [Examples](docs/EXAMPLES.md) page, including [a routine engineering change](docs/EXAMPLES.md#example-3-a-routine-engineering-change) that it rates likely benign.
 
 ## How it works
 

@@ -26,6 +26,10 @@ The interface is a single file, `static/index.html`, with no build step. It is s
 
 ![The Timing and raw result tab, listing each step with its model, seconds and token counts](screenshot-x01-next-steps.png)
 
+**Scan history.** Every run is saved in the visitor's own browser, newest first, with its verdict, priority, confidence and run time. Opening a row shows its full result again without running the alert a second time.
+
+![The Scan history section listing five runs with their verdicts, priorities, confidence and run times](screenshot-history.png)
+
 ## API used by the page
 
 | Endpoint | Purpose |

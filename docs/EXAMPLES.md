@@ -48,6 +48,27 @@ SentinelOT returned, in 29 seconds:
 
 ![The next steps for alert x01 in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-x01-next-steps.png)
 
+## Example 3: a routine engineering change
+
+**The alert:** a Modbus/TCP "write multiple registers" command (function code 16) from the engineering workstation to the line 1 PLC, three registers, at 08:55 on a Tuesday, with a change ticket referenced in the session notes.
+
+SentinelOT returned, in 26 seconds:
+
+- **Verdict:** likely benign, priority P4, confidence 95%
+- **Why:** the write came from the known engineering workstation, inside its documented Tuesday 08:00 to 10:00 change window, and referenced a change ticket. The destination is a high-criticality PLC, but programming PLCs is the workstation's approved function.
+- **ATT&CK for ICS:** no techniques mapped. The mapper is allowed to return none when nothing fits.
+- **Threat intelligence:** three sources, treated as background. They describe how Modbus function code 16 writes can be abused, including by the FrostyGoop malware and the INCONTROLLER tool, but nothing in this alert pointed to malicious behaviour.
+- **Evidence:** 8 lines, citing fields of the alert, fields of the asset record, and the intake and intel summaries
+- **Next steps:** two read-only checks (review the change ticket and its approval records, and check the Modbus logs for any other writes to the PLC outside the approved window) and none that need operator approval
+
+![The pipeline for alert x03 after a finished run, with the time of every step](screenshot-x03-pipeline.png)
+
+![The result for alert x03: verdict likely benign, priority P4, confidence 95%, with the reasoning and no actions needing an operator](screenshot-x03-result.png)
+
+![The next steps for alert x03, with nothing in the operator lane, and the Evidence tab listing the eight lines the verdict rests on](screenshot-x03-next-steps.png)
+
+Notice what is quiet here: the verdict is grey, no technique is mapped, and the "Needs an operator" lane is empty. The verdict also rests partly on the ticket reference in the alert text. SentinelOT has no access to a ticketing system, so its first suggested step is for a person to check the ticket. This is one of the limits listed on the [Evaluation](EVALUATION.md) page.
+
 ## Other runs from the live demo
 
 | Alert | Verdict | Priority | Confidence | Run time |
@@ -55,8 +76,14 @@ SentinelOT returned, in 29 seconds:
 | s01: Modbus write coil command to PLC from non-engineering host | Escalate | P1 | 90% | 26 s |
 | s09: Repeated failed OPC-UA authentication | Investigate | P2 | 75% | 24 s |
 | x01: Successful remote login to SCADA server from VPN | Escalate | P1 | 90% | 29 s |
+| x03: Engineering workstation writing PLC parameters in change window | Likely benign | P4 | 95% | 26 s |
+| x08: Unknown device reading from two PLCs | Investigate | P2 | 85% | 38 s |
 
-These are single runs. Results vary between runs, so see [Evaluation](EVALUATION.md) for what repeated runs show.
+These are single runs. Run times in this table range from 24 to 38 seconds, and results vary between runs, so see [Evaluation](EVALUATION.md) for what repeated runs show.
+
+The page keeps these runs in its **Scan history** section, newest first, with the verdict, priority, confidence and run time of each:
+
+![The Scan history section after five live runs: x03 likely benign, x08 investigate, x01 escalate, s09 investigate and s01 escalate](screenshot-history.png)
 
 ## What every result contains
 
