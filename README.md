@@ -4,7 +4,7 @@
 
 Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Agents**, on **NVIDIA Nemotron models served by Nebius Token Factory**.
 
-![The SentinelOT web interface: the home page with the intro, the "Why I built it" note and the list of synthetic alerts](docs/screenshot-home.png)
+![The SentinelOT web interface: the header with its status strip, the intro and the "Why I built it" note](docs/screenshot-home.png)
 
 [Demo](#links) | [How it works](#how-it-works) | [Nemotron and Nebius](#how-we-use-nemotron-token-factory-nebius-and-tavily) | [Results](#results-at-a-glance) | [Test plant](#the-test-plant-at-a-glance) | [Run it](#quick-start) | [All documentation](#where-to-go-next)
 
