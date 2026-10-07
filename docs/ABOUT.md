@@ -17,6 +17,20 @@ Answering them takes asset knowledge, protocol knowledge, current threat informa
 
 
 
+## Beyond OT
+
+SentinelOT is built for industrial alerts, but nothing in its pipeline is specific to OT. The five agents, the code checks and the web interface would carry over to IT alerts with little change. What would change is the asset inventory, the ATT&CK matrix, the trusted threat-intelligence sources, the prompts and the test scenarios. That work is not done, and SentinelOT has not been tested on IT alerts.
+
+| Would change | Would carry over |
+|---|---|
+| The asset inventory (servers, laptops and accounts instead of PLCs and RTUs) | The five-agent pipeline and the order it runs in |
+| The ATT&CK matrix (Enterprise instead of ICS) | The code checks: sources must have been retrieved, technique IDs must exist, and the verdict must agree with the priority |
+| The trusted sources for threat intelligence | The rule that it recommends and never acts |
+| The prompts and the verdict definitions | The web page, scan history and saved results |
+| The test scenarios and their expected answers | The way results are measured |
+
+The ATT&CK mapper is the part most likely to need real work. The Enterprise matrix is much larger than the ICS one, so giving the model the full technique list, as SentinelOT does now, may not be practical.
+
 See [Examples](EXAMPLES.md) for what a result looks like, and [How it works](HOW_IT_WORKS.md) for the agents behind it.
 
 ---

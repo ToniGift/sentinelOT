@@ -59,6 +59,12 @@ More detail is on the [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) page.
 
 These were measured on the original eight-asset test plant, with synthetic alerts written by one author. SentinelOT is a research prototype, not a production security tool. How the numbers were produced, and their limits, are on the [Evaluation](docs/EVALUATION.md) page.
 
+## What's next
+
+- **Lab alerts.** Test SentinelOT on alerts from my own home lab (LabShock with an ELK stack), instead of only alerts I wrote myself.
+- **A shadow-mode trial,** with permission, on a company's past and already labelled alerts: an analyst's decision next to SentinelOT's, with nothing acted on.
+- **IT alerts.** The pipeline is not specific to OT, but this has not been built or tested. See [Beyond OT](docs/ABOUT.md#beyond-ot).
+
 ## The test plant at a glance
 
 SentinelOT is tested against a fictional packaging plant: fourteen assets across six levels. Every name, address and alert is invented.
