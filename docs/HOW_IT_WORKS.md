@@ -4,7 +4,7 @@
 
 ---
 
-![SentinelOT architecture](architecture.png)
+![SentinelOT architecture](images/architecture.png)
 
 An ordinary Python orchestrator runs five AI agents in a fixed order and checks every output in code before it is used.
 

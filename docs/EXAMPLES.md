@@ -19,13 +19,13 @@ SentinelOT returned, in 26 seconds:
 - **Evidence:** 21 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
 - **Next steps:** three read-only checks (review the PLC diagnostic and Modbus traffic logs for the state of coil 12, check network flow and IDS logs for other connections from the same host, and interview the user of the office PC) and two that need operator approval (temporarily block Modbus traffic from the source to the PLC at the firewall or zone boundary, and, if the change was not intended, write the coil back to OFF from an approved engineering station)
 
-![The pipeline for alert s01 after a finished run, with the time of every step](screenshot-s01-pipeline.png)
+![The pipeline for alert s01 after a finished run, with the time of every step](images/screenshot-s01-pipeline.png)
 
-![The result for alert s01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-s01-result.png)
+![The result for alert s01, showing the verdict, priority, confidence, reasoning and the start of the next steps](images/screenshot-s01-result.png)
 
-![The next steps for alert s01 in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-s01-next-steps.png)
+![The next steps for alert s01 in two lanes, and the timing tab with the model, seconds and token counts of every step](images/screenshot-s01-next-steps.png)
 
-![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list](screenshot-s01-threat-intel.png)
+![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list](images/screenshot-s01-threat-intel.png)
 
 An earlier run of the same alert returned a confidence of 0.92 in about 28 seconds and mapped T0831, Manipulation of Control. Results vary between runs, which is why the [Evaluation](EVALUATION.md) page reports repeated runs.
 
@@ -42,11 +42,11 @@ SentinelOT returned, in 29 seconds:
 - **Evidence:** 20 lines, each citing a field of the alert, a field of the asset record or a retrieved finding
 - **Next steps:** two read-only checks (review the Windows logon events on the server, and review the VPN authentication logs for the source address) and four that need operator approval (disable or reset the service account, require multi-factor authentication for remote RDP, block RDP from the VPN zone to the supervisory zone unless it is approved, and collect volatile memory and a forensic image of the server)
 
-![The pipeline for alert x01 after a finished run, with the time of every step](screenshot-x01-pipeline.png)
+![The pipeline for alert x01 after a finished run, with the time of every step](images/screenshot-x01-pipeline.png)
 
-![The result for alert x01, showing the verdict, priority, confidence, reasoning and the start of the next steps](screenshot-x01-result.png)
+![The result for alert x01, showing the verdict, priority, confidence, reasoning and the start of the next steps](images/screenshot-x01-result.png)
 
-![The next steps for alert x01 in two lanes, and the timing tab with the model, seconds and token counts of every step](screenshot-x01-next-steps.png)
+![The next steps for alert x01 in two lanes, and the timing tab with the model, seconds and token counts of every step](images/screenshot-x01-next-steps.png)
 
 ## Example 3: a routine engineering change
 
@@ -61,11 +61,11 @@ SentinelOT returned, in 26 seconds:
 - **Evidence:** 8 lines, citing fields of the alert, fields of the asset record, and the intake and intel summaries
 - **Next steps:** two read-only checks (review the change ticket and its approval records, and check the Modbus logs for any other writes to the PLC outside the approved window) and none that need operator approval
 
-![The pipeline for alert x03 after a finished run, with the time of every step](screenshot-x03-pipeline.png)
+![The pipeline for alert x03 after a finished run, with the time of every step](images/screenshot-x03-pipeline.png)
 
-![The result for alert x03: verdict likely benign, priority P4, confidence 95%, with the reasoning and no actions needing an operator](screenshot-x03-result.png)
+![The result for alert x03: verdict likely benign, priority P4, confidence 95%, with the reasoning and no actions needing an operator](images/screenshot-x03-result.png)
 
-![The next steps for alert x03, with nothing in the operator lane, and the Evidence tab listing the eight lines the verdict rests on](screenshot-x03-next-steps.png)
+![The next steps for alert x03, with nothing in the operator lane, and the Evidence tab listing the eight lines the verdict rests on](images/screenshot-x03-next-steps.png)
 
 Notice what is quiet here: the verdict is grey, no technique is mapped, and the "Needs an operator" lane is empty. The verdict also rests partly on the ticket reference in the alert text. SentinelOT has no access to a ticketing system, so its first suggested step is for a person to check the ticket. This is one of the limits listed on the [Evaluation](EVALUATION.md) page.
 
@@ -83,7 +83,7 @@ These are single runs. Run times in this table range from 24 to 38 seconds, and 
 
 The page keeps these runs in its **Scan history** section, newest first, with the verdict, priority, confidence and run time of each:
 
-![The Scan history section after five live runs: x03 likely benign, x08 investigate, x01 escalate, s09 investigate and s01 escalate](screenshot-history.png)
+![The Scan history section after five live runs: x03 likely benign, x08 investigate, x01 escalate, s09 investigate and s01 escalate](images/screenshot-history.png)
 
 ## What every result contains
 

@@ -18,9 +18,9 @@ All scenarios are synthetic and written by the author. The plant they are set in
 Reproduce:
 
 ```
-python eval.py heldout2 3      # fresh held-out set, 3 runs
-python eval.py dev 3           # development set, 3 runs
-python injection_test.py       # controlled prompt-injection test
+python -m app.eval heldout2 3      # fresh held-out set, 3 runs
+python -m app.eval dev 3           # development set, 3 runs
+python -m app.injection_test       # controlled prompt-injection test
 python -m pytest -q tests      # offline tests
 ```
 

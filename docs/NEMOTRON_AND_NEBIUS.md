@@ -14,7 +14,7 @@
 
 SentinelOT does not scan any network or the internet. It searches for published advisories with the Tavily Search API and summarises what comes back. For the s01 alert (an office PC writing to a PLC), the Threat intel tab shows two results, both from `cisa.gov` and both marked **On the trusted list**.
 
-![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list, each with a link and a short finding](screenshot-s01-threat-intel.png)
+![The Threat intel tab for alert s01, showing two CISA advisories marked as on the trusted list, each with a link and a short finding](images/screenshot-s01-threat-intel.png)
 
 Both are real, public CISA advisories, and the findings match them:
 
@@ -27,6 +27,10 @@ Two things to keep in mind when reading results like this:
 
 - **They are background, not a match for the plant's own PLC.** Both advisories are about specific products. The inventory entry for the line 1 PLC names no vendor or model, so the result treats them as general evidence that Modbus often lacks authentication. The explanation in the run says so.
 - **The open web is a fallback.** Searches go to the trusted sites first. A result from anywhere else is labelled as an unverified source. In this run there were none.
+
+## Our feedback
+
+The build log, the per-step measurements and our written feedback on Nebius Token Factory, NVIDIA Nemotron and Tavily are in [NOTES.md](NOTES.md).
 
 ---
 

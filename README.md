@@ -4,7 +4,7 @@
 
 Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Agents**, on **NVIDIA Nemotron models served by Nebius Token Factory**.
 
-![The SentinelOT web interface: the header with its status strip, the intro and the "Why I built it" note](docs/screenshot-home.png)
+![The SentinelOT web interface: the header with its status strip, the intro and the "Why I built it" note](docs/images/screenshot-home.png)
 
 [Demo](#links) | [How it works](#how-it-works) | [Nemotron and Nebius](#how-we-use-nemotron-token-factory-nebius-and-tavily) | [Results](#results-at-a-glance) | [Test plant](#the-test-plant-at-a-glance) | [Run it](#quick-start) | [All documentation](#where-to-go-next)
 
@@ -25,7 +25,7 @@ For an alert reporting five failed RDP logins followed by a successful login to 
 - **Mapped to:** MITRE ATT&CK for ICS T0822 External Remote Services and T0859 Valid Accounts
 - **Next steps:** two read-only checks and four actions that need operator approval
 
-![A finished run for alert x01: verdict Escalate, priority P1, confidence 90%, with the reasoning and the next steps](docs/screenshot-x01-result.png)
+![A finished run for alert x01: verdict Escalate, priority P1, confidence 90%, with the reasoning and the next steps](docs/images/screenshot-x01-result.png)
 
 More on the [Examples](docs/EXAMPLES.md) page, including [a routine engineering change](docs/EXAMPLES.md#example-3-a-routine-engineering-change) that it rates likely benign.
 
@@ -33,7 +33,7 @@ More on the [Examples](docs/EXAMPLES.md) page, including [a routine engineering 
 
 An ordinary Python program runs five AI agents in a fixed order: Intake, Intel, ATT&CK mapper, Triage analyst and Response advisor. The Tavily search runs beside the mapper to save time. After each step, code (not the model) removes sources that were never retrieved and technique IDs that do not exist, makes sure the verdict agrees with the priority, and flags instructions hidden in alert text. Every suggested action is labelled read-only or needs operator approval.
 
-![SentinelOT architecture](docs/architecture.png)
+![SentinelOT architecture](docs/images/architecture.png)
 
 The agents and every check are described on the [How it works](docs/HOW_IT_WORKS.md) page.
 
@@ -49,7 +49,7 @@ The agents and every check are described on the [How it works](docs/HOW_IT_WORKS
 
 **What we learned.** The small Nemotron 3.5 Lightning model spent many reasoning tokens on simple extraction and made the first step slow, so we moved that step to Super. Reasoning tokens count against the output limit, so our client allows generous output sizes and parses the JSON from the reply.
 
-More detail is on the [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) page.
+More detail is on the [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) page. Our build log and our feedback on Nebius, NVIDIA and Tavily are in [NOTES.md](docs/NOTES.md).
 
 ## Results at a glance
 
@@ -86,6 +86,7 @@ The full table with addresses and criticality, and a zone diagram, are on the [T
 |---|---|
 | try the live demo | [Testing the demo](docs/TESTING.md) |
 | see the full Nemotron, Token Factory, Nebius and Tavily details | [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) |
+| read the build log and our feedback on Nebius, NVIDIA and Tavily | [NOTES.md](docs/NOTES.md) |
 | see what a result looks like | [Examples](docs/EXAMPLES.md) |
 | understand the problem and what it does not do | [About](docs/ABOUT.md) |
 | see how the five agents and the code checks work | [How it works](docs/HOW_IT_WORKS.md) |
@@ -110,7 +111,7 @@ Then open http://localhost. Running without Docker, the settings and the server 
 
 ## License and notices
 
-SentinelOT is released under the **MIT License** (see `LICENSE`). It uses MITRE ATT&CK® for ICS data. ATT&CK® is a registered trademark of The MITRE Corporation, and this project is not affiliated with or endorsed by MITRE. See `NOTICE.md` for MITRE's terms and other third-party notices.
+SentinelOT is released under the **MIT License** (see `LICENSE`). It uses MITRE ATT&CK® for ICS data. ATT&CK® is a registered trademark of The MITRE Corporation, and this project is not affiliated with or endorsed by MITRE. See [`docs/NOTICE.md`](docs/NOTICE.md) for MITRE's terms and other third-party notices.
 
 ## Author
 

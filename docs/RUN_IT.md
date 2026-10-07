@@ -20,20 +20,20 @@ copy .env.example .env            # Linux/macOS: cp .env.example .env
 Open `.env` and fill in your keys. Then list the models your key can use and copy the exact Nemotron model IDs into the `MODEL_*` lines:
 
 ```
-python smoke_test.py
-python smoke_test.py nvidia/nemotron-3-super-120b-a12b     # tests one model for valid JSON
+python -m app.smoke_test
+python -m app.smoke_test nvidia/nemotron-3-super-120b-a12b     # tests one model for valid JSON
 ```
 
 Start the web app and open http://localhost:8000:
 
 ```
-uvicorn main:app --port 8000
+uvicorn app.main:app --port 8000
 ```
 
 Or triage one scenario from the command line:
 
 ```
-python run_pipeline.py s01
+python -m app.run_pipeline s01
 ```
 
 ## 2. Run it with Docker
@@ -52,7 +52,7 @@ docker compose up -d --build
 
 ## 3. Deploy to a server
 
-[`DEPLOY.md`](../DEPLOY.md) explains how to put it on a virtual machine step by step.
+[`DEPLOY.md`](DEPLOY.md) explains how to put it on a virtual machine step by step.
 
 ## Configuration (`.env`)
 
