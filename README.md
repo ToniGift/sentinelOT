@@ -69,6 +69,31 @@ Search (Tavily) runs beside the mapper to save time.
 - **Tavily Search API** supplies live threat intelligence. Searches go first to trusted sites (CISA, MITRE ATT&CK, NVD, CVE.org). Results from other sites are labelled as unverified.
 - **Nebius AI Cloud:** the public demo runs in Docker on a Nebius AI Cloud virtual machine. **[CONFIRM AFTER DEPLOYMENT]**
 
+## Web interface
+
+The interface is a single file, `static/index.html`, with no build step. It is served by the same FastAPI app.
+
+- **Pick an alert** from the list (the *Set* column shows whether it belongs to the development or a held-out set), or press **Start with an example**.
+- **Live pipeline drawing.** The drawing of the five agents, the search step and the three code checks lights up as each step finishes, using the real step timings from the run. The search and the ATT&CK mapper are drawn side by side because they run side by side.
+- **Result view.** A verdict panel (verdict, a P1 to P4 priority scale, a confidence bar and four counters), a short *Why* and *What it could do to the process*, next steps in two lanes (*Safe to do now* and *Needs an operator*), and tabs for Evidence, Threat intel, ATT&CK, Intake, Checks, and Timing and raw result.
+- **Show last saved result** reads the most recent stored run of the chosen alert from the server, so the demo still works if the model service is slow or a run limit has been reached.
+- **Scan history.** Every run is saved in the visitor's own browser (not on the server). The last 20 are kept, can be reopened without running again, downloaded as JSON or cleared. When the page is reopened, the latest saved run is shown again and marked as saved.
+- **Keyboard shortcuts:** `j` and `k` move through alerts, `r` runs the selected alert, `/` jumps to the list, `t` switches theme, `?` lists the shortcuts.
+- **Also:** light, dark and automatic themes, smooth scrolling from the navigation bar, and a back-to-top button.
+- **If the API cannot be reached** (for example when the file is opened straight from disk), the page shows clearly labelled sample data for two alerts instead of failing silently. Sample runs are never saved to history.
+- **Footer details.** The repository link and any personal links are set in the `ABOUT` block near the top of the script in `static/index.html`. Empty values are not shown.
+
+### API used by the page
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | Returns `{"ok": true}` when the server is running |
+| `GET /api/scenarios` | Lists the synthetic alerts |
+| `POST /api/demo/{id}` | Starts a run of a named alert and returns a `job_id` |
+| `GET /api/jobs/{job_id}` | Returns the run status, the steps finished so far and, when done, the result |
+| `GET /api/saved/{id}` | Returns the last stored result for an alert |
+| `POST /api/triage` | Free-form alert submission, protected by the `X-Admin-Token` header |
+
 ## Run it yourself
 
 ### 1. Run it with Python
@@ -111,6 +136,12 @@ docker compose up --build
 
 Open http://localhost. Docker Compose starts the app and Caddy, a small web server that sits in front of it. Stop with Ctrl+C, then `docker compose down`.
 
+After you change `static/index.html`, rebuild so the new page is copied into the image:
+
+```
+docker compose up -d --build
+```
+
 ### 3. Deploy to a server
 
 `DEPLOY.md` explains how to put it on a virtual machine step by step.
@@ -133,16 +164,79 @@ Never commit `.env`. It is listed in `.gitignore`.
 ## Testing the demo (for judges)
 
 1. Open the live demo link above.
-2. Choose a synthetic alert from the list. The set has three groups: a development set, and two held-out sets.
-3. Press **Run triage**. The six steps appear as each agent finishes, and a full result follows in about 20 to 50 seconds.
+2. Choose a synthetic alert from the list, or press **Start with an example**. The set has three groups: a development set, and two held-out sets.
+3. Press **Triage this alert**. The steps light up as each agent finishes, and a full result follows in about 20 to 50 seconds.
 4. Press **Show last saved result** to see a stored result for the chosen scenario at any time. This works even if the model service is slow.
-5. Try the alerts that contain hidden instructions (H06, H07 and X07) to see the embedded-instruction warning.
+5. Try the alerts that contain hidden instructions (`h06`, `h07` and `x07`) to see the embedded-instruction warning.
+6. Open the **Scan history** section to reopen anything you have run, without running it again. Your history stays in your own browser.
 
 To protect the project's credit, public runs are limited per visitor and per day. When a limit is reached, saved results are still available. Alerts are synthetic, so no real plant data is involved.
 
+## Test plant (synthetic)
+
+SentinelOT is tested against a fictional packaging plant with fourteen assets arranged in six levels, from Level 0 field devices to Level 4 enterprise, with a Level 3.5 DMZ between operations and the enterprise network. Every name, address, account and alert is invented. No real plant, employer or client data is used.
+
+The asset inventory is `data/assets.json`. SentinelOT looks up both ends of every alert in it, which is how it knows an asset's criticality, its zone and whether a change window is open. Seven of the fourteen assets are rated high criticality, six medium and one low.
+
+| Asset | Address | Type | Zone | Criticality | Function |
+|---|---|---|---|---|---|
+| IO-Module-Line2 | 10.10.10.12 | Remote I/O module | Level 0 field | High | EtherNet/IP remote I/O for PLC-Line2, drives the line 2 outputs |
+| VFD-Conveyor-1 | 10.10.10.21 | Variable frequency drive | Level 0 field | Medium | Drives the line 1 conveyor motor, controlled by PLC-Line1 over EtherNet/IP |
+| SENSOR-GW-1 | 10.10.10.30 | Sensor gateway | Level 0 field | Medium | Modbus TCP gateway for line 1 temperature and pressure sensors, read by PLC-Line1 |
+| PLC-Line1 | 10.10.20.11 | PLC | Level 1 control | High | Packaging line 1 control |
+| PLC-Line2 | 10.10.20.12 | PLC | Level 1 control | High | Packaging line 2 control, has an EtherNet/IP I/O module |
+| RTU-Outstation-3 | 10.10.20.30 | RTU | Level 1 control | High | Utility metering outstation, reports to SCADA over DNP3 |
+| SCADA-SRV-01 | 10.10.30.10 | SCADA server | Level 2 supervisory | High | SCADA server with OPC-UA endpoint and DNP3 master |
+| HMI-Line1 | 10.10.30.5 | HMI | Level 2 supervisory | Medium | Operator screen for line 1 |
+| HIST-01 | 10.10.40.20 | Historian | Level 3 operations | Medium | Process data historian, polls PLCs read-only |
+| ENG-WS-01 | 10.10.40.8 | Engineering workstation | Level 3 operations | High | PLC programming. Approved change window: Tuesday 08:00-10:00 local time |
+| PATCH-SRV-01 | 10.10.45.10 | Patch server | Level 3.5 DMZ | Medium | Stages approved patches for OT. Pushes to ENG-WS-01 only inside the Tuesday change window |
+| HIST-DMZ-01 | 10.10.45.20 | Historian replica | Level 3.5 DMZ | Medium | Read-only copy of historian data for the enterprise network. Receives from HIST-01 only |
+| JUMP-SRV-01 | 10.10.45.5 | Jump server | Level 3.5 DMZ | High | Remote access entry point for OT. Approved vendor access window: Wednesday 09:00-11:00 local time |
+| OFFICE-PC-14 | 10.10.50.7 | Office PC | Level 4 enterprise | Low | Office workstation, not an engineering station |
+
+```mermaid
+flowchart TB
+  subgraph L4["Level 4 enterprise"]
+    OFFICE["OFFICE-PC-14 (low)"]
+  end
+  subgraph L35["Level 3.5 DMZ"]
+    JUMP["JUMP-SRV-01 (high)"]
+    PATCH["PATCH-SRV-01 (medium)"]
+    HISTD["HIST-DMZ-01 (medium)"]
+  end
+  subgraph L3["Level 3 operations"]
+    ENG["ENG-WS-01 (high)"]
+    HIST["HIST-01 (medium)"]
+  end
+  subgraph L2["Level 2 supervisory"]
+    SCADA["SCADA-SRV-01 (high)"]
+    HMI["HMI-Line1 (medium)"]
+  end
+  subgraph L1["Level 1 control"]
+    PLC1["PLC-Line1 (high)"]
+    PLC2["PLC-Line2 (high)"]
+    RTU["RTU-Outstation-3 (high)"]
+  end
+  subgraph L0["Level 0 field"]
+    IO["IO-Module-Line2 (high)"]
+    VFD["VFD-Conveyor-1 (medium)"]
+    SGW["SENSOR-GW-1 (medium)"]
+  end
+  L4 ~~~ L35
+  L35 ~~~ L3
+  L3 ~~~ L2
+  L2 ~~~ L1
+  L1 ~~~ L0
+```
+
+The diagram shows zones only. The inventory does not define which assets talk to which.
+
+**Limits of the test plant:** hardwired sensors and actuators with no network address are not modelled. The inventory lists zones and devices, not network paths. Addresses outside the inventory, such as the VPN pool, are treated as unknown sources.
+
 ## Evaluation
 
-All scenarios are synthetic, written by the author, and each has an expected verdict and acceptable ATT&CK techniques written before the run. Each set was run three times because results vary between runs.
+All scenarios are synthetic and written by the author. Each has an expected verdict and acceptable ATT&CK techniques written before the run. Each set was run three times because results vary between runs. These results were produced when the inventory held the eight assets at Levels 1 to 4. The six Level 0 and Level 3.5 assets were added afterwards, and the results have not been re-run since.
 
 | Set | Scenarios | Verdicts correct | Techniques acceptable |
 |---|---|---|---|
@@ -186,7 +280,7 @@ assets.py           asset inventory lookup (data/assets.json)
 scenarios*.py       the 32 synthetic alerts and their expected labels
 eval.py             evaluation runner
 injection_test.py   controlled prompt-injection test
-static/index.html   the web page
+static/index.html   the web page (a single file, no build step)
 Dockerfile, docker-compose.yml, Caddyfile   container setup
 tests/              offline tests
 ```
