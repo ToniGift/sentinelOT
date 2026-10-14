@@ -10,12 +10,6 @@ Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Age
 
 ## Links
 
-| | |
-|---|---|
-| Live demo | **[ADD LIVE DEMO URL]** |
-| Demo video (YouTube, under 3 minutes) | **[ADD YOUTUBE URL]** |
-| Devpost submission | **[ADD DEVPOST URL]** |
-| Source code | This repository |
 
 ## A result in three lines
 
