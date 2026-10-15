@@ -8,9 +8,6 @@ Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Age
 
 [How it works](#how-it-works) | [Nemotron and Nebius](#how-we-use-nemotron-token-factory-nebius-and-tavily) | [Results](#results-at-a-glance) | [Test plant](#the-test-plant-at-a-glance) | [Run it](#quick-start) | [All documentation](#where-to-go-next)
 
-
-
-
 ## A result in three lines
 
 For an alert reporting five failed RDP logins followed by a successful login to the SCADA server from the VPN pool, SentinelOT returned, in 29 seconds:
@@ -38,7 +35,7 @@ The agents and every check are described on the [How it works](docs/HOW_IT_WORKS
 | **NVIDIA Nemotron 3 Ultra** | Makes the main triage decision: verdict, priority, confidence and evidence |
 | **NVIDIA Nemotron 3 Super** | Runs the four faster steps: intake, intel summary, ATT&CK mapping and response advice |
 | **Nebius Token Factory** | Serves all five model calls through one OpenAI-compatible API, using the standard `openai` Python SDK. The large model takes the hard decision and the smaller one the quick steps. By our estimate a full triage costs about 1 to 1.5 cents. |
-| **Nebius AI Cloud** | The public demo runs in Docker on a Nebius AI Cloud virtual machine. **[CONFIRM AFTER DEPLOYMENT]** |
+| **Nebius AI Cloud** | SentinelOT is packaged to run in Docker on a Nebius AI Cloud virtual machine. A public demo is not deployed yet. |
 | **Tavily Search API** | Supplies live threat intelligence. Searches go first to trusted sites (CISA, MITRE ATT&CK, NVD, CVE.org), results from other sites are labelled unverified, and code removes any cited link that was not actually retrieved. SentinelOT searches published advisories. It does not scan any network. See [what Tavily returned](docs/NEMOTRON_AND_NEBIUS.md#what-tavily-returned) for a real example. |
 
 **What we learned.** The small Nemotron 3.5 Lightning model spent many reasoning tokens on simple extraction and made the first step slow, so we moved that step to Super. Reasoning tokens count against the output limit, so our client allows generous output sizes and parses the JSON from the reply.
@@ -78,7 +75,7 @@ The full table with addresses and criticality, and a zone diagram, are on the [T
 
 | I want to... | Go to |
 |---|---|
-| try the live demo | [Testing the demo](docs/TESTING.md) |
+| test it once it is running | [Testing the demo](docs/TESTING.md) |
 | see the full Nemotron, Token Factory, Nebius and Tavily details | [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) |
 | read the build log and our feedback on Nebius, NVIDIA and Tavily | [NOTES.md](docs/NOTES.md) |
 | see what a result looks like | [Examples](docs/EXAMPLES.md) |
@@ -94,8 +91,8 @@ The full table with addresses and criticality, and a zone diagram, are on the [T
 You need Docker, a Nebius Token Factory API key and a Tavily API key.
 
 ```
-git clone https://github.com/YOUR_USERNAME/sentinelot.git
-cd sentinelot
+git clone https://github.com/ToniGift/sentinelOT.git
+cd sentinelOT
 copy .env.example .env            # Linux/macOS: cp .env.example .env
 # open .env and add your two API keys, then:
 docker compose up --build
