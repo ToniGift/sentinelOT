@@ -9,8 +9,8 @@
 You need Python 3.11 or newer, a Nebius Token Factory API key and a Tavily API key.
 
 ```
-git clone https://github.com/YOUR_USERNAME/sentinelot.git
-cd sentinelot
+git clone https://github.com/ToniGift/sentinelOT.git
+cd sentinelOT
 python -m venv .venv
 .venv\Scripts\activate            # Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt

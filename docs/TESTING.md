@@ -9,7 +9,7 @@
 3. Press **Run triage**. The steps light up as each agent finishes, and a full result follows in about 20 to 50 seconds.
 4. Press **Show last saved result** to see a stored result for the chosen scenario at any time. This works even if the model service is slow.
 5. Try the alerts that contain hidden instructions (`h06`, `h07` and `x07`) to see the embedded-instruction warning. Scenarios H06, H07 and X07 contain hidden instructions and show a warning.
-6. Open the **History** section. It lists the last 20 runs saved on the server, from any device, so you can reopen them without running them again.
+6. Open the **History** section. On the live demo, the History section also lists the last 20 runs saved on the server, from any device. In a copy you run yourself, history is kept in your own browser.
 
 To protect the project's credit, public runs are rate-limited per visitor and per day. When a limit is reached, saved results always work. Alerts are synthetic, so no real plant data is involved (see [Test plant](TEST_PLANT.md)).
 

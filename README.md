@@ -1,5 +1,7 @@
 # SentinelOT
 
+![SentinelOT: an AI copilot that triages OT/ICS security alerts](docs/images/cover.jpg)
+
 **An AI copilot that triages OT/ICS security alerts.** It reads an alert from an industrial network, adds context about the assets involved, looks up current threat intelligence, maps the activity to MITRE ATT&CK for ICS, and gives a security analyst a verdict, evidence and recommended next steps. It recommends. It never acts.
 
 Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Agents**, on **NVIDIA Nemotron models served by Nebius Token Factory**.
@@ -13,6 +15,7 @@ Built for the **Nebius x NVIDIA Global AI Hackathon**, track **Best Apps and Age
 | | |
 |---|---|
 | Live demo | **[http://sentinelot.213-239-174-15.sslip.io/](http://sentinelot.213-239-174-15.sslip.io/)** (backup: [http://213.239.174.15](http://213.239.174.15)) |
+| Demo video | **[https://youtu.be/G8_dhWq9-PM](https://youtu.be/G8_dhWq9-PM)** |
 | Source code | [https://github.com/ToniGift/sentinelOT](https://github.com/ToniGift/sentinelOT) |
 
 Served over plain HTTP. If your browser warns, choose Continue to site. No login or personal data is involved.
@@ -57,11 +60,11 @@ More detail is on the [Nemotron and Nebius](docs/NEMOTRON_AND_NEBIUS.md) page. O
 - **Prompt injection:** 0 of 10 injected runs followed the hidden instruction
 - **Speed:** median 26 seconds per alert across 66 runs
 
-These were measured on the original eight-asset test plant, with synthetic alerts written by one author. SentinelOT is a research prototype, not a production security tool. How the numbers were produced, and their limits, are on the [Evaluation](docs/EVALUATION.md) page.
+These were measured on the original eight-asset test plant, with synthetic alerts written with AI assistance (Claude), then reviewed and run by me. SentinelOT is a research prototype, not a production security tool. How the numbers were produced, and their limits, are on the [Evaluation](docs/EVALUATION.md) page.
 
 ## What's next
 
-- **Lab alerts.** Test SentinelOT on alerts from my own home lab (LabShock with an ELK stack), instead of only alerts I wrote myself.
+- **Lab alerts.** Test SentinelOT on alerts from my own home lab (LabShock with an ELK stack), instead of only alerts written with AI assistance.
 - **A shadow-mode trial,** with permission, on a company's past and already labelled alerts: an analyst's decision next to SentinelOT's, with nothing acted on.
 - **IT alerts.** The pipeline is not specific to OT, but this has not been built or tested. See [Beyond OT](docs/ABOUT.md#beyond-ot).
 
